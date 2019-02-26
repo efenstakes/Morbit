@@ -2,14 +2,13 @@
 var express = require('express')
 var router = express.Router()
 
+var jwt = require('jsonwebtoken')
+
 // import the database handle
 var db = require('../config/mysql')
 
 // save route
 router.post('/save', function(req, res) {
-  
-  console.log('got body')
-  console.log(req.body)
 
   let response = { saved: false, id: null }
 
@@ -36,17 +35,6 @@ router.post('/save', function(req, res) {
 // delete user
 router.post('/delete', function(req, res) {
     res.send('delete user')
-})
-
-
-// get session for user 
-router.post('/get-session', function(req, res) {
-    res.send('get session')
-})
-
-// check if user has a session
-router.post('/has-session', function(req, res) {
-    res.send('has session')
 })
 
 // get details for this user
@@ -104,4 +92,22 @@ router.get('/:id/items', function(req, res) {
 })
 
 
+
+// get session for user 
+router.post('/get-session', function(req, res) {
+    res.send('get session')
+})
+
+// check if user has a session
+router.post('/has-session', function(req, res) {
+    res.send('has session')
+})
+
+// log a user in
+app.post('/login', passport.authenticate('local', { session: false }), function(req, res){
+  let token = jwt.sign({ data: req.user.id }, 'secret')
+  return res.json({ token: token })
+})
+
+// 
 module.exports = router 

@@ -15,33 +15,38 @@ passport_options.secretOrKey = 'secret';
 
 // setup passport local to allow authentication of users based on their name and password
 passport.use(new LocalStrategy({
-       usernameField: 'name',
-       passwordField: 'password'
+      usernameField: 'name',
+      passwordField: 'password'
     },
     function(username, password, done) {
       let query = 'select * from users where name = ? and password = ?'
       db.query(query, [ username, password ], function(error, results, fields){
-          /* if(error) {
-              return done(error)
-          }
-          if() */
-          console.log('error', error)
-          console.log('results ', results)
-      })
+        if(error || !results[0]) {
+            return done(error, false)
+        } // if(error || !results[0]) { .. }
+        if( results[0] ){
+            return done(null, results[0])
+        } // if( results[0] ){ .. }
+          
+      }) // db.query(query, [ username, password ], function(error, results, fields){ .. })
     } // function(username, password, done) { .. }
 )) // passport.use(new LocalStrategy(..))
 
 
 // setup jwt authentication
 passport.use(new JwtStrategy(passport_options, function(jwt_payload, done){
-
-    let user_id = jwt_payload.sub 
+    console.log('passport jwt auth', jwt_payload.data )
+    let user_id = jwt_payload.data 
     let query = 'select * from users where id = ?'
 
     db.query(query, [ user_id ], function(error, results, fields){
        
-        console.log('error', error)
-        console.log('results ', results)
+        if(error  || !results[0]){
+            done(error, false)
+        } // if(error  || !results[0]){ .. }
+        if( results[0] ){
+           done(null, results[0])
+        } // if( results[0] ){ .. }
 
     }) // db.query(query, [ user_id ], function(error, results, fields){ .. })
 

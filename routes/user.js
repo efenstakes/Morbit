@@ -2,10 +2,14 @@
 var express = require('express')
 var router = express.Router()
 
+var passport = require('passport')
 var jwt = require('jsonwebtoken')
 
 // import the database handle
 var db = require('../config/mysql')
+
+// import application config constants
+var AppVars = require('../config/vars')
 
 // save route
 router.post('/save', function(req, res) {
@@ -33,8 +37,12 @@ router.post('/save', function(req, res) {
 
 
 // delete user
-router.post('/delete', function(req, res) {
-    res.send('delete user')
+router.post('/delete', passport.authenticate('jwt', { session: false }), function(req, res) {
+   if(req.user && req.user.id == req.params.id){
+       db.query(query, [ req.user.id ], function(){
+           req.json({ deleted: true })
+       })
+   }
 })
 
 // get details for this user
@@ -92,21 +100,19 @@ router.get('/:id/items', function(req, res) {
 })
 
 
-
-// get session for user 
-router.post('/get-session', function(req, res) {
-    res.send('get session')
-})
-
 // check if user has a session
-router.post('/has-session', function(req, res) {
-    res.send('has session')
+router.post('/has-session', passport.authenticate('jwt', { session: false }), function(req, res) {
+    if(req.user) {
+        res.json({ has_session: true, session_user: req.user })
+    } else {
+        res.json({ has_session: false })
+    }
 })
 
 // log a user in
-app.post('/login', passport.authenticate('local', { session: false }), function(req, res){
-  let token = jwt.sign({ data: req.user.id }, 'secret')
-  return res.json({ token: token })
+router.post('/login', passport.authenticate('local', { session: false }), function(req, res){
+  let token = jwt.sign({ data: req.user.id }, AppVars.jwt.secret)
+  return res.json({ token: token, user: req.user })
 })
 
 // 

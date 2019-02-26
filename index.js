@@ -2,6 +2,9 @@
 var express = require('express')
 var bodyParser = require('body-parser')
 
+var passport = require('passport')
+var expressSession = require('express-session')
+
 // import my codes
 // routes
 var userRoutes = require('./routes/user')
@@ -9,7 +12,7 @@ var itemRoutes = require('./routes/item')
 var bidRoutes = require('./routes/bid')
 
 // db config
-var dbConnection = require('./config/mysql')
+// var dbConnection = require('./config/mysql')
 
 // passport config
 
@@ -21,18 +24,27 @@ var app = express()
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-/**
-    // Express Session
-    app.use(session({
-        secret: 'secret',
-        saveUninitialized: true,
-        resave: true
-    }));
 
-    // Passport
-    app.use(passport.initialize());
-    app.use(passport.session());
-*/
+// Express Session
+app.use(expressSession({
+    secret: 'secret',
+    saveUninitialized: true,
+    resave: true
+}))
+
+// Passport
+app.use(passport.initialize())
+app.use(passport.session())
+
+require('./config/passport')
+
+var isAuthenticated = function(req, res, next) {
+    if( req.isAuthenticated() ){
+        next()
+    }else{
+        return res.json({ 'error': 'not authenticated' })
+    }
+ }// end of isAuthenticated
 
 // set up the routes
 app.use('/api/user', userRoutes)

@@ -2,9 +2,11 @@
 var express = require('express')
 var router = express.Router()
 
+var passport = require('passport')
+
 // save route
-router.post('/save', function(req, res) {
-    res.send('save')
+router.post('/save', passport.authenticate('jwt', { session: false }), function(req, res) {
+    res.json({ saved: false })
 })
 
 

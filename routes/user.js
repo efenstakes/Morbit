@@ -39,9 +39,15 @@ router.post('/save', function(req, res) {
 // delete user
 router.post('/delete', passport.authenticate('jwt', { session: false }), function(req, res) {
    if(req.user && req.user.id == req.params.id){
-       db.query(query, [ req.user.id ], function(){
-           req.json({ deleted: true })
+       db.query(query, [ req.user.id ], function(error, result){
+           if( error || result.affectedRows == 0 ) {
+              req.json({ deleted: false })
+           }else{
+              req.json({ deleted: true })
+           }
        })
+   } else {
+       req.json({ deleted: false })
    }
 })
 

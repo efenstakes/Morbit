@@ -84,7 +84,7 @@ router.get('/:id/bids', function(req, res) {
 router.get('/all', function(req, res) {
     let query = 'select * from items'
 
-    db.query(query, [ ], function(error, results, fields) {
+    db.query(query, function(error, results, fields) {
         
         if(results) {
             res.json({ items: results })

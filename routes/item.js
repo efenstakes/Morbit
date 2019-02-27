@@ -23,7 +23,7 @@ router.post('/save', passport.authenticate('jwt', { session: false }), function(
 
 // delete route
 router.post('/:id/delete', passport.authenticate('jwt', { session: false }), function(req, res) {
-    let { user_id } = req.user 
+    let { id } = req.user 
     let { item_id } = req.params
     let query = 'select * from items where id = ? and user_id = ?'
     let deleteQuery = 'delete from items where id = ?'

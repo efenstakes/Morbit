@@ -121,5 +121,10 @@ router.post('/login', passport.authenticate('local', { session: false }), functi
   return res.json({ token: token, user: req.user })
 })
 
+router.post('/logout', function(req, res) {
+    req.logout()
+    res.json({ logged_out: true })
+})
+
 // 
 module.exports = router 
